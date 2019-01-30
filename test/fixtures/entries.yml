@@ -1,0 +1,29 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  national_rol: MyString
+  concession_name: MyString
+  titular_name: MyString
+  titular_dni: MyString
+  detail_link: MyString
+  region: MyString
+  province: MyString
+  commune: MyString
+  belogings: MyString
+  hectares: MyString
+  rol_situation: MyString
+  payment: MyString
+
+two:
+  national_rol: MyString
+  concession_name: MyString
+  titular_name: MyString
+  titular_dni: MyString
+  detail_link: MyString
+  region: MyString
+  province: MyString
+  commune: MyString
+  belogings: MyString
+  hectares: MyString
+  rol_situation: MyString
+  payment: MyString
