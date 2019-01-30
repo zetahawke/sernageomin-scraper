@@ -1,4 +1,4 @@
-class Sernageomin
+class SernageominService
   require 'open-uri'
   require 'nokogiri'
 
