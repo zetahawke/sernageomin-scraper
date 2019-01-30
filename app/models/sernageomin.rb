@@ -3,23 +3,33 @@ class Sernageomin
   require 'nokogiri'
 
   REGIONS = (1..15)
+  MAX_THREADS = ENV.fetch("RAILS_MAX_THREADS") { 5 }
 
   def initialize(url_to_scrap)
     @url = url_to_scrap
     @current_page = ''
     @current_url = ''
     @last_row = ''
+    @region_on_reading = []
+    @threads = []
   end
 
-  def scrap(region = 1)
+  def scrap(region = 1, page = 1)
     return if region > 15
 
-    open_page(region)
+    @threads << Thread.new {
+      puts "Embinding new thread"
+      open_page(region, page)
+    }
+    while (!(@threads.count { |thread| thread.alive? } < 5))
+      sleep(1)
+    end
+    # sleep until @threads.count { |thread| thread.alive? } < 5
     region += 1
-    scrap(region)
+    scrap(region, 1)
   rescue StandardError => e
     puts e.message
-    scrap(region + 1)
+    scrap(region + 1, 1)
   end
 
   def open_page(region_number, page_number = 1, last_row_data = nil)
