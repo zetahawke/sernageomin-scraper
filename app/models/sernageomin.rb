@@ -16,17 +16,16 @@ class Sernageomin
 
   def scrap(region = 1, page = 1)
     return if region > 15
-
+    
+    while (!(@threads.count { |thread| thread.alive? } < 5))
+      sleep(1)
+    end
     @threads << Thread.new {
       puts "Embinding new thread"
       open_page(region, page)
     }
-    while (!(@threads.count { |thread| thread.alive? } < 5))
-      sleep(1)
-    end
     # sleep until @threads.count { |thread| thread.alive? } < 5
-    region += 1
-    scrap(region, 1)
+    scrap(region + 1, 1)
   rescue StandardError => e
     puts e.message
     scrap(region + 1, 1)
@@ -38,9 +37,18 @@ class Sernageomin
     puts @current_url
     html = agent.get(@current_url)
     triggers_consult(html)
+    
+    puts end_of_table
+    
+    page_readed = Entry.find_by(national_rol: end_of_table)
+    
+    puts page_readed.blank?
+
     return if last_row_data == end_of_table
 
-    last_row_data = open_rows.last.search('th, td').first.try(:text).try(:strip)
+    readed_rows = read_rows
+    last_row_data = readed_rows.last.search('th, td').first.try(:text).try(:strip)
+    open_rows(readed_rows) if page_readed.blank?
     page_number += 1
     open_page(region_number, page_number, last_row_data)
   end
@@ -59,9 +67,12 @@ class Sernageomin
     @last_row.search('th, td').first.try(:text).try(:strip)
   end
 
-  def open_rows
+  def read_rows
     table = @current_page.search('table')[1]
-    rows = table.search('tr')
+    table.search('tr')
+  end
+  
+  def open_rows(rows = [])
     initial_keys = rows[0].search('th, td').map { |cell| cell.try(:text).try(:strip) }
     base_obj = new_base_obj(initial_keys)
 
@@ -95,7 +106,12 @@ class Sernageomin
   def populate_obj(obj, row)
     obj.keys.each_with_index do |key, index|
       if key.to_s.downcase.include?('detalle')
-        obj['details'] = bring_details(row.search('th, td')[index])
+        cell = row.search('th, td')[index]
+        return if cell.blank?
+
+        links = cell.css('a')
+        obj['details'] = bring_details(cell)
+        obj['link'] = links.first['href']
       else
         obj[key] = row.search('th, td')[index].try(:text).try(:strip) unless key.blank?
       end
@@ -103,17 +119,13 @@ class Sernageomin
     obj
   end
 
-  def bring_details(cell)
-    return if cell.blank?
-
-    links = cell.css('a')
+  def bring_details(links)
     return if links.blank?
 
     html = open("http://sitiohistorico.sernageomin.cl/#{links.first['href']}")
     doc = Nokogiri::HTML(html)
     obj = object_from_table(doc)
     # puts "http://sitiohistorico.sernageomin.cl/#{links.first['href']}"
-    obj['link'] = links.first['href']
     obj
   end
 
