@@ -17,13 +17,13 @@ class Sernageomin
   def scrap(region = 1, page = 1)
     return if region > 15
     
-    while (!(@threads.count { |thread| thread.alive? } < 5))
+    while (!(@threads.count { |thread| thread.alive? } < MAX_THREADS))
       sleep(1)
     end
     @threads << Thread.new {
       puts "Embinding new thread"
-      open_page(region, page)
     }
+    open_page(region, page)
     # sleep until @threads.count { |thread| thread.alive? } < 5
     scrap(region + 1, 1)
   rescue StandardError => e
@@ -109,9 +109,9 @@ class Sernageomin
         cell = row.search('th, td')[index]
         return if cell.blank?
 
-        links = cell.css('a')
-        obj['details'] = bring_details(cell)
-        obj['link'] = links.first['href']
+        links = cell.at('a')
+        obj['details'] = bring_details(links)
+        obj['link'] = links['href']
       else
         obj[key] = row.search('th, td')[index].try(:text).try(:strip) unless key.blank?
       end
@@ -122,7 +122,7 @@ class Sernageomin
   def bring_details(links)
     return if links.blank?
 
-    html = open("http://sitiohistorico.sernageomin.cl/#{links.first['href']}")
+    html = open("http://sitiohistorico.sernageomin.cl/#{links['href']}")
     doc = Nokogiri::HTML(html)
     obj = object_from_table(doc)
     # puts "http://sitiohistorico.sernageomin.cl/#{links.first['href']}"
