@@ -3,7 +3,7 @@ class Sernageomin
   require 'nokogiri'
 
   REGIONS = (1..15)
-  MAX_THREADS = ENV.fetch("RAILS_MAX_THREADS") { 5 }
+  MAX_THREADS = ENV.fetch("RAILS_MAX_THREADS") { 8 }
 
   def initialize(url_to_scrap)
     @url = url_to_scrap
@@ -22,8 +22,8 @@ class Sernageomin
     end
     @threads << Thread.new {
       puts "Embinding new thread"
+      open_page(region, page)
     }
-    open_page(region, page)
     # sleep until @threads.count { |thread| thread.alive? } < 5
     scrap(region + 1, 1)
   rescue StandardError => e
@@ -110,8 +110,8 @@ class Sernageomin
         return if cell.blank?
 
         links = cell.at('a')
-        obj['details'] = bring_details(links)
         obj['link'] = links['href']
+        obj['details'] = bring_details(links)
       else
         obj[key] = row.search('th, td')[index].try(:text).try(:strip) unless key.blank?
       end
