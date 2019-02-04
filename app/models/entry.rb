@@ -24,4 +24,19 @@ class Entry < ApplicationRecord
     base[:payment] = obj['details']['Pago']
     base
   end
+
+  def self.scrap_more_results(url, region = 1, page = 1)
+    region.times.each do |reg|
+      EntriesWorker.perform_async(url: url, region: reg + 1, page: page)
+    end
+  end
+
+  def self.number_of_current_jobs
+    require 'sidekiq/api'
+
+    queue = Sidekiq::Queue.all
+    workers = Sidekiq::Workers.new
+    
+    (queue.size || 0) + (workers.size || 0)
+  end
 end
