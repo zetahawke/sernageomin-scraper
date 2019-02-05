@@ -1,1 +1,1 @@
-entriesworker: bundle exec sidekiq -c 2
+entriesworker: bundle exec sidekiq -c 25
