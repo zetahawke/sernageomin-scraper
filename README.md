@@ -55,6 +55,7 @@ entries/init_scrap POST
 entries/completed_records GET
 - require: 
 - - headers:
+- - params: { page: 1, per_page: 25 }
 - - body:
 ---
 
@@ -63,5 +64,6 @@ entries/completed_records GET
 entries/empty_records GET
 - require: 
 - - headers:
+- - params: { page: 1, per_page: 25 }
 - - body:
 ---

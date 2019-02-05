@@ -1,7 +1,7 @@
 class EntriesController < ApplicationController
   def Index
-    result = Entry.all.page(params[:page] || 1).per(params[:per_page] || 25)
-    render json: { number: result.size, data: result }, status: :ok
+    result = Entry.all
+    render json: { number: result.size, data: result.page(params[:page] || 1).per(params[:per_page] || 25) }, status: :ok
   end
 
   def init_scrap
@@ -15,12 +15,12 @@ class EntriesController < ApplicationController
   end
 
   def empty_records
-    result = Entry.where(region: nil).page(params[:page] || 1).per(params[:per_page] || 25)
-    render json: { number: result.size, data: result }, status: :ok
+    result = Entry.where(region: nil)
+    render json: { number: result.size, data: result.page(params[:page] || 1).per(params[:per_page] || 25) }, status: :ok
   end
 
   def completed_records
-    result = Entry.where.not(region: nil).page(params[:page] || 1).per(params[:per_page] || 25)
-    render json: { number: result.size, data: result }, status: :ok
+    result = Entry.where.not(region: nil)
+    render json: { number: result.size, data: result.page(params[:page] || 1).per(params[:per_page] || 25) }, status: :ok
   end
 end
