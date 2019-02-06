@@ -1,5 +1,5 @@
 class EntriesController < ApplicationController
-  def Index
+  def index
     result = Entry.all
     render json: { number: result.size, data: result.page(params[:page] || 1).per(params[:per_page] || 25) }, status: :ok
   end

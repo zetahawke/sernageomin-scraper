@@ -81,5 +81,5 @@ test:
 production:
   <<: *default
   database: sernageomin-scrapper_production
-  username: sernageomin-scrapper
+  username: <%= ENV['SERNAGEOMIN-SCRAPPER_DATABASE_USERNAME'] %>
   password: <%= ENV['SERNAGEOMIN-SCRAPPER_DATABASE_PASSWORD'] %>
