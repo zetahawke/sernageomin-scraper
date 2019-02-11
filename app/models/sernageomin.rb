@@ -51,7 +51,9 @@ class Sernageomin
     open_rows(readed_rows) if page_readed.blank?
     page_number += 1
     open_page(region_number, page_number, last_row_data)
+    
     agent.shutdown
+    Rails.cache.clear
   end
 
   def triggers_consult(html)
