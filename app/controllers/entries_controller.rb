@@ -12,6 +12,8 @@ class EntriesController < ApplicationController
       Entry.scrap_more_results(params[:url], params[:region], params[:page])
       render json: { data: { status: 'Starting to scrap' } }, status: :ok
     end
+  rescue StandardError => e
+    render json: { data: { status: 'Error when init scrap' } }, status: :unprocessable_entity
   end
 
   def empty_records
